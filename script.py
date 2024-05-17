@@ -6,7 +6,7 @@ import uuid
 
 app = Flask(__name__)
 
-END_OF_MESSAGE = "\f"
+END_OF_MESSAGE = "\n"
 
 
 @app.route("/", methods=["GET", "POST"])

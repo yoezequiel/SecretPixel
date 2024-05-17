@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='decrypt.css') }}" />
+        <link
+            rel="shortcut icon"
+            href="static/img/secretpixel.png"
+            type="image/x-icon" />
+        <title>Desencriptar</title>
+    </head>
+    <body>
+        <form method="post" enctype="multipart/form-data" action="/decrypt">
+            <h1>Desencriptar Mensaje de Imagen</h1>
+            <input type="file" name="image_file" accept="image/*" />
+            <button type="submit">Desencriptar</button>
+        </form>
+    </body>
+</html>
