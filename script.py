@@ -1,37 +1,28 @@
-from flask import Flask, render_template, request, send_file, after_this_request
 from PIL import Image
-import io
-import os
-import uuid
 
-app = Flask(__name__)
-
-END_OF_MESSAGE = "\n"
+END_OF_MESSAGE = "\f"
 
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        action = request.form["action"]
-        if action == "encrypt":
-            return render_template("encrypt.html")
-        elif action == "decrypt":
-            return render_template("decrypt.html")
-    return render_template("index.html")
-
-
-@app.route("/encrypt", methods=["POST"])
 def encrypt():
-    text_file = request.files["text_file"]
-    image_file = request.files["image_file"]
+    text_file = input(
+        "Introduce el nombre del archivo de texto a encriptar (con extensión): "
+    )
+    image_file = input(
+        "Introduce el nombre de la imagen donde quieres ocultar el texto (con extensión): "
+    )
+    output_image = input(
+        "Introduce el nombre del archivo de imagen de salida (con extensión): "
+    )
 
-    message = text_file.read().decode("utf-8") + END_OF_MESSAGE
+    with open(text_file, "r") as file:
+        message = file.read() + END_OF_MESSAGE
 
-    img = Image.open(io.BytesIO(image_file.read()))
+    img = Image.open(image_file)
     width, height = img.size
 
     if len(message) * 8 > width * height:
-        return "El mensaje es demasiado grande para ocultarlo en esta imagen."
+        print("El mensaje es demasiado grande para ocultarlo en esta imagen.")
+        return
 
     binary_message = "".join(format(ord(char), "08b") for char in message)
 
@@ -45,30 +36,19 @@ def encrypt():
                     index += 1
             img.putpixel((x, y), tuple(pixel))
 
-    temp_filename = str(uuid.uuid4()) + ".png"
-    img.save(temp_filename)
+    img.save(output_image)
+    print("¡Encriptación exitosa!")
 
-    @after_this_request
-    def remove_temp(response):
-        try:
-            os.remove(temp_filename)
-        except:
-            pass
-        return response
 
-    return send_file(
-        temp_filename,
-        mimetype="image/png",
-        as_attachment=True,
-        download_name="encrypted_image.png",
+def decrypt():
+    image_file = input(
+        "Introduce el nombre de la imagen a desencriptar (con extensión): "
+    )
+    output_text = input(
+        "Introduce el nombre del archivo de texto de salida (con extensión): "
     )
 
-
-@app.route("/decrypt", methods=["POST"])
-def decrypt():
-    image_file = request.files["image_file"]
-
-    img = Image.open(io.BytesIO(image_file.read()))
+    img = Image.open(image_file)
     width, height = img.size
 
     binary_message = ""
@@ -85,8 +65,21 @@ def decrypt():
             break
         message += char
 
-    return message
+    with open(output_text, "w") as file:
+        file.write(message)
+
+    print("¡Desencriptación exitosa!")
+
+
+def main():
+    choice = input("¿Quieres encriptar (E) o desencriptar (D)? ").upper()
+    if choice == "E":
+        encrypt()
+    elif choice == "D":
+        decrypt()
+    else:
+        print("Opción no válida.")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
