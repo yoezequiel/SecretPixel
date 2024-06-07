@@ -8,6 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    flex-direction: column;
 }
 
 form {
@@ -50,4 +51,8 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
     background-color: #0288d1;
+}
+
+.error {
+    color: red;
 }
